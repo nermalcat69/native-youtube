@@ -1,7 +1,7 @@
 use anyhow::Result;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use tracing::info;
 
@@ -14,7 +14,7 @@ pub struct Profile {
     pub path: PathBuf,
 }
 
-pub fn init(data_dir: &PathBuf) -> Result<()> {
+pub fn init(data_dir: &Path) -> Result<()> {
     let profiles_dir = data_dir.join("profiles");
 
     for name in &["default", "work", "personal"] {

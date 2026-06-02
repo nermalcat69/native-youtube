@@ -2,7 +2,7 @@ use anyhow::Result;
 use once_cell::sync::OnceCell;
 use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::Path;
 use std::sync::Mutex;
 use tracing::info;
 use uuid::Uuid;
@@ -22,7 +22,7 @@ pub struct Download {
     pub created_at: String,
 }
 
-pub fn init(data_dir: &PathBuf) -> Result<()> {
+pub fn init(data_dir: &Path) -> Result<()> {
     let db_path = data_dir.join("downloads.db");
     let conn = Connection::open(&db_path)?;
 

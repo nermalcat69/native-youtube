@@ -185,18 +185,18 @@ pub fn run() {
             .build()?;
 
             // On macOS hide to tray instead of quitting when the window is closed.
-            let handle = app.handle().clone();
-            yt_win.on_window_event(move |event| {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                    #[cfg(target_os = "macos")]
-                    {
+            #[cfg(target_os = "macos")]
+            {
+                let handle = app.handle().clone();
+                yt_win.on_window_event(move |event| {
+                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                         api.prevent_close();
                         if let Some(w) = handle.get_webview_window("youtube") {
                             let _ = w.hide();
                         }
                     }
-                }
-            });
+                });
+            }
 
             // ── Tray icon ─────────────────────────────────────────────────
             let show_yt = MenuItem::with_id(app, "show", "Show YouTube", true, None::<&str>)?;

@@ -52,7 +52,7 @@ pub async fn init() -> Result<()> {
     let mut filter_set = FilterSet::new(true);
 
     filter_set.add_filters(
-        &YOUTUBE_RULES
+        YOUTUBE_RULES
             .iter()
             .map(|s| s.to_string())
             .collect::<Vec<_>>(),

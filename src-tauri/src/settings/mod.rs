@@ -1,7 +1,7 @@
 use anyhow::Result;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use tracing::info;
 
@@ -39,7 +39,7 @@ impl Default for Settings {
     }
 }
 
-pub fn init(data_dir: &PathBuf) -> Result<()> {
+pub fn init(data_dir: &Path) -> Result<()> {
     let path = data_dir.join("settings.json");
     SETTINGS_PATH
         .set(path.clone())
