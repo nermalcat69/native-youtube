@@ -38,7 +38,7 @@ tp-yt-paper-dialog:has(ytd-ad-slot-renderer),
 fn cosmetic_script() -> String {
     format!(
         r#"(function(){{
-    const ID='graytube-cosmetic';
+    const ID='youtube-cosmetic';
     function inject(){{
         if(document.getElementById(ID))return;
         const s=document.createElement('style');
@@ -122,7 +122,7 @@ fn build_settings_window(app: &tauri::AppHandle) -> tauri::Result<()> {
     // In dev Tauri automatically routes App URLs to the Vite dev server.
     let url = WebviewUrl::App("index.html".into());
     WebviewWindowBuilder::new(app, "settings", url)
-        .title("GrayTube — Settings")
+        .title("Youtube — Settings")
         .inner_size(480.0, 700.0)
         .resizable(true)
         .build()?;
@@ -178,7 +178,7 @@ pub fn run() {
                 "youtube",
                 WebviewUrl::External("https://www.youtube.com".parse().unwrap()),
             )
-            .title("GrayTube")
+            .title("Youtube")
             .inner_size(1280.0, 800.0)
             .min_inner_size(900.0, 600.0)
             .initialization_script(&init_script)
@@ -199,11 +199,11 @@ pub fn run() {
             }
 
             // ── Tray icon ─────────────────────────────────────────────────
-            let show_yt = MenuItem::with_id(app, "show", "Show YouTube", true, None::<&str>)?;
+            let show_yt = MenuItem::with_id(app, "show", "Show Youtube", true, None::<&str>)?;
             let settings =
                 MenuItem::with_id(app, "settings", "Settings & Downloads", true, None::<&str>)?;
             let sep = tauri::menu::PredefinedMenuItem::separator(app)?;
-            let quit = MenuItem::with_id(app, "quit", "Quit GrayTube", true, None::<&str>)?;
+            let quit = MenuItem::with_id(app, "quit", "Quit Youtube", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show_yt, &settings, &sep, &quit])?;
 
             let handle2 = app.handle().clone();
@@ -246,7 +246,7 @@ pub fn run() {
                 }
             });
 
-            info!("GrayTube initialized");
+            info!("Youtube initialized");
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -266,5 +266,5 @@ pub fn run() {
             updater::install_update,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running GrayTube");
+        .expect("error while running Youtube");
 }

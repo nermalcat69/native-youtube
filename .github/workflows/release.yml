@@ -40,7 +40,6 @@ jobs:
           key: macos-${{ matrix.arch }}
 
       - run: brew install create-dmg
-
       - run: npm ci
 
       - name: Build .app
@@ -49,15 +48,15 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run tauri build -- --bundles app --target ${{ matrix.rust_target }}
 
-      - name: Create DMG
+      - name: Create DMG → built/
         run: node scripts/make-dmg.mjs
 
       - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          name: GrayTube ${{ github.ref_name }}
-          files: src-tauri/target/release/bundle/dmg/GrayTube_*.dmg
+          name: Youtube ${{ github.ref_name }}
+          files: built/*.dmg
 
   # ── Windows ──────────────────────────────────────────────────────────────
   release-windows:
@@ -81,18 +80,21 @@ jobs:
 
       - run: npm ci
 
-      - name: Build MSI + NSIS installer
-        uses: tauri-apps/tauri-action@v0
+      - name: Build MSI + NSIS
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run tauri build -- --bundles msi,nsis
+
+      - name: Collect → built/
+        run: node scripts/collect.mjs
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: GrayTube ${{ github.ref_name }}
-          releaseDraft: true
-          prerelease: false
-          args: --bundles msi,nsis
+          draft: true
+          name: Youtube ${{ github.ref_name }}
+          files: built/*.msi,built/*.exe
 
   # ── Linux ────────────────────────────────────────────────────────────────
   release-linux:
@@ -128,14 +130,17 @@ jobs:
       - run: npm ci
 
       - name: Build AppImage + deb
-        uses: tauri-apps/tauri-action@v0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run tauri build -- --bundles appimage,deb
+
+      - name: Collect → built/
+        run: node scripts/collect.mjs
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: GrayTube ${{ github.ref_name }}
-          releaseDraft: true
-          prerelease: false
-          args: --bundles appimage,deb
+          draft: true
+          name: Youtube ${{ github.ref_name }}
+          files: built/*.AppImage,built/*.deb

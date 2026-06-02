@@ -1,5 +1,5 @@
 {
-  "name": "graytube",
+  "name": "youtube",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -9,7 +9,10 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:app": "tauri build --bundles app",
-    "tauri:dmg": "npm run tauri:app && node scripts/make-dmg.mjs"
+    "tauri:dmg": "npm run tauri:app && node scripts/make-dmg.mjs",
+    "tauri:win": "tauri build --bundles msi,nsis && node scripts/collect.mjs",
+    "tauri:linux": "tauri build --bundles appimage,deb && node scripts/collect.mjs",
+    "collect": "node scripts/collect.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "GrayTube",
+  "productName": "Youtube",
   "version": "0.1.0",
-  "identifier": "com.graycup.graytube",
+  "identifier": "com.graycup.youtube",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -27,13 +27,13 @@
     ],
     "category": "Entertainment",
     "shortDescription": "Lightweight YouTube desktop client with ad-blocking and SponsorBlock",
-    "longDescription": "GrayTube is a native desktop YouTube client built with Tauri. It features Brave's adblock-rust engine for network ad-blocking, cosmetic ad filtering, SponsorBlock integration for automatic sponsor skipping, multi-profile support, and a native download manager."
+    "longDescription": "Youtube is a native desktop YouTube client built with Tauri. It features Brave's adblock-rust engine for network ad-blocking, cosmetic ad filtering, SponsorBlock integration for automatic sponsor skipping, multi-profile support, and a native download manager."
   },
   "plugins": {
     "updater": {
       "pubkey": "",
       "endpoints": [
-        "https://github.com/graycup/graytube/releases/latest/download/latest.json"
+        "https://github.com/graycup/native-youtube/releases/latest/download/latest.json"
       ]
     }
   }

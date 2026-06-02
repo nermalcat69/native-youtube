@@ -67,7 +67,7 @@ export default function YouTubePage({ settings }: Props) {
       <div className="flex-1 flex items-center justify-center bg-neutral-950">
         <div className="text-center text-neutral-600 space-y-4 max-w-sm px-6">
           <div className="text-6xl">▶</div>
-          <h2 className="text-white text-xl font-semibold">GrayTube</h2>
+          <h2 className="text-white text-xl font-semibold">Youtube</h2>
           <p className="text-sm leading-relaxed">
             In the compiled desktop app, YouTube loads here in a native system
             webview — fully ad-blocked, with SponsorBlock and cosmetic filtering

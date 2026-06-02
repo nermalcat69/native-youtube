@@ -150,7 +150,7 @@ export default function SettingsPage() {
           <div className="bg-neutral-900 rounded-xl px-4">
             <Toggle
               label="Auto update"
-              description="Automatically install GrayTube updates"
+              description="Automatically install Youtube updates"
               checked={settings.auto_update}
               onChange={(v) => update({ auto_update: v })}
             />
