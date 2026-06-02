@@ -9,47 +9,112 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  # ── macOS (arm64 + x86_64) ──────────────────────────────────────────────
+  release-macos:
+    name: Release · macOS · ${{ matrix.arch }}
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest
+          - arch: aarch64
             rust_target: aarch64-apple-darwin
-            arch: aarch64
-          - platform: macos-latest
+          - arch: x86_64
             rust_target: x86_64-apple-darwin
-            arch: x86_64
-          - platform: ubuntu-22.04
-            rust_target: ""
-            arch: ""
-          - platform: windows-latest
-            rust_target: ""
-            arch: ""
-
-    runs-on: ${{ matrix.platform }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
+          cache: npm
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.rust_target }}
 
-      - name: Cache Rust
-        uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: "./src-tauri -> target"
+          workspaces: src-tauri -> target
+          key: macos-${{ matrix.arch }}
 
-      - name: Install Linux system deps
-        if: matrix.platform == 'ubuntu-22.04'
+      - run: brew install create-dmg
+
+      - run: npm ci
+
+      - name: Build .app
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run tauri build -- --bundles app --target ${{ matrix.rust_target }}
+
+      - name: Create DMG
+        run: node scripts/make-dmg.mjs
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: GrayTube ${{ github.ref_name }}
+          files: src-tauri/target/release/bundle/dmg/GrayTube_*.dmg
+
+  # ── Windows ──────────────────────────────────────────────────────────────
+  release-windows:
+    name: Release · Windows · x86_64
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: windows-x86_64
+
+      - run: npm ci
+
+      - name: Build MSI + NSIS installer
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: GrayTube ${{ github.ref_name }}
+          releaseDraft: true
+          prerelease: false
+          args: --bundles msi,nsis
+
+  # ── Linux ────────────────────────────────────────────────────────────────
+  release-linux:
+    name: Release · Linux · x86_64
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: linux-x86_64
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -60,29 +125,9 @@ jobs:
             libssl-dev \
             pkg-config
 
-      - name: Install create-dmg (macOS)
-        if: matrix.platform == 'macos-latest'
-        run: brew install create-dmg
+      - run: npm ci
 
-      - name: Install frontend deps
-        run: npm ci
-
-      # Build .app only on macOS; we create the DMG ourselves to avoid the
-      # AppleScript/Finder automation permission error that Tauri's bundler hits
-      # in headless CI environments (osascript error -1743).
-      - name: Build app (macOS)
-        if: matrix.platform == 'macos-latest'
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: npm run tauri build -- --bundles app --target ${{ matrix.rust_target }}
-
-      - name: Create DMG (macOS)
-        if: matrix.platform == 'macos-latest'
-        run: node scripts/make-dmg.mjs
-
-      - name: Build (Linux / Windows)
-        if: matrix.platform != 'macos-latest'
+      - name: Build AppImage + deb
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -90,18 +135,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "GrayTube ${{ github.ref_name }}"
-          releaseBody: |
-            See the [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          releaseName: GrayTube ${{ github.ref_name }}
           releaseDraft: true
           prerelease: false
-
-      - name: Upload DMG to release (macOS)
-        if: matrix.platform == 'macos-latest'
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          name: "GrayTube ${{ github.ref_name }}"
-          files: src-tauri/target/release/bundle/dmg/GrayTube_*.dmg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          args: --bundles appimage,deb

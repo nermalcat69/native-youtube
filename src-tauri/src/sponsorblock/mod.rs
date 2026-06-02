@@ -1,12 +1,11 @@
 use anyhow::Result;
+use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Mutex;
-use once_cell::sync::Lazy;
 
-static CACHE: Lazy<Mutex<HashMap<String, Vec<Segment>>>> =
-    Lazy::new(|| Mutex::new(HashMap::new()));
+static CACHE: Lazy<Mutex<HashMap<String, Vec<Segment>>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
 const API_BASE: &str = "https://sponsor.ajay.app/api";
 
@@ -54,7 +53,10 @@ pub async fn get_segments(video_id: &str, categories: &[&str]) -> Result<Vec<Seg
     }
 
     let segments: Vec<Segment> = resp.error_for_status()?.json().await?;
-    CACHE.lock().unwrap().insert(video_id.to_string(), segments.clone());
+    CACHE
+        .lock()
+        .unwrap()
+        .insert(video_id.to_string(), segments.clone());
 
     Ok(segments)
 }

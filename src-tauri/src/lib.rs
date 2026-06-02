@@ -199,11 +199,12 @@ pub fn run() {
             });
 
             // ── Tray icon ─────────────────────────────────────────────────
-            let show_yt  = MenuItem::with_id(app, "show",     "Show YouTube",         true, None::<&str>)?;
-            let settings = MenuItem::with_id(app, "settings", "Settings & Downloads", true, None::<&str>)?;
-            let sep      = tauri::menu::PredefinedMenuItem::separator(app)?;
-            let quit     = MenuItem::with_id(app, "quit",     "Quit GrayTube",        true, None::<&str>)?;
-            let menu     = Menu::with_items(app, &[&show_yt, &settings, &sep, &quit])?;
+            let show_yt = MenuItem::with_id(app, "show", "Show YouTube", true, None::<&str>)?;
+            let settings =
+                MenuItem::with_id(app, "settings", "Settings & Downloads", true, None::<&str>)?;
+            let sep = tauri::menu::PredefinedMenuItem::separator(app)?;
+            let quit = MenuItem::with_id(app, "quit", "Quit GrayTube", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_yt, &settings, &sep, &quit])?;
 
             let handle2 = app.handle().clone();
             TrayIconBuilder::new()
@@ -211,7 +212,9 @@ pub fn run() {
                 .menu(&menu)
                 .on_menu_event(move |_tray, event| match event.id.as_ref() {
                     "quit" => handle2.exit(0),
-                    "settings" => { let _ = open_settings(handle2.clone()); }
+                    "settings" => {
+                        let _ = open_settings(handle2.clone());
+                    }
                     "show" => {
                         if let Some(w) = handle2.get_webview_window("youtube") {
                             let _ = w.show();

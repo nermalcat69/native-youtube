@@ -1,8 +1,8 @@
 use anyhow::Result;
+use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Mutex;
-use once_cell::sync::OnceCell;
 use tracing::info;
 
 static PROFILES_DIR: OnceCell<PathBuf> = OnceCell::new();
@@ -93,9 +93,7 @@ pub fn set_active_profile(name: String) -> Result<(), String> {
 
 #[tauri::command]
 pub fn create_profile(name: String) -> Result<Profile, String> {
-    let dir = PROFILES_DIR
-        .get()
-        .ok_or("profiles not initialized")?;
+    let dir = PROFILES_DIR.get().ok_or("profiles not initialized")?;
 
     let profile_path = dir.join(&name);
     std::fs::create_dir_all(&profile_path).map_err(|e| e.to_string())?;

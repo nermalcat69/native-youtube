@@ -1,11 +1,11 @@
 use anyhow::Result;
-use rusqlite::{Connection, params};
+use once_cell::sync::OnceCell;
+use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Mutex;
-use once_cell::sync::OnceCell;
-use uuid::Uuid;
 use tracing::info;
+use uuid::Uuid;
 
 static DB: OnceCell<Mutex<Connection>> = OnceCell::new();
 
@@ -51,14 +51,21 @@ fn with_db<F, T>(f: F) -> Result<T>
 where
     F: FnOnce(&Connection) -> Result<T>,
 {
-    let guard = DB.get()
+    let guard = DB
+        .get()
         .ok_or_else(|| anyhow::anyhow!("DB not initialized"))?
         .lock()
         .map_err(|_| anyhow::anyhow!("DB mutex poisoned"))?;
     f(&guard)
 }
 
-pub fn create_download(video_id: &str, title: &str, url: &str, file_path: &str, format: &str) -> Result<String> {
+pub fn create_download(
+    video_id: &str,
+    title: &str,
+    url: &str,
+    file_path: &str,
+    format: &str,
+) -> Result<String> {
     let id = Uuid::new_v4().to_string();
     with_db(|conn| {
         conn.execute(
@@ -98,7 +105,8 @@ pub fn list_downloads() -> Result<Vec<Download>> {
                 created_at: row.get(8)?,
             })
         })?;
-        rows.collect::<rusqlite::Result<Vec<_>>>().map_err(Into::into)
+        rows.collect::<rusqlite::Result<Vec<_>>>()
+            .map_err(Into::into)
     })
 }
 

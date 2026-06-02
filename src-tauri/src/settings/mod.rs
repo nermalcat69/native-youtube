@@ -1,8 +1,8 @@
 use anyhow::Result;
+use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Mutex;
-use once_cell::sync::OnceCell;
 use tracing::info;
 
 static SETTINGS_PATH: OnceCell<PathBuf> = OnceCell::new();
@@ -61,7 +61,9 @@ pub fn init(data_dir: &PathBuf) -> Result<()> {
 }
 
 fn save() -> Result<()> {
-    let path = SETTINGS_PATH.get().ok_or_else(|| anyhow::anyhow!("settings not initialized"))?;
+    let path = SETTINGS_PATH
+        .get()
+        .ok_or_else(|| anyhow::anyhow!("settings not initialized"))?;
     let guard = SETTINGS
         .get()
         .ok_or_else(|| anyhow::anyhow!("settings not initialized"))?

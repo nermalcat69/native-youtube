@@ -17,10 +17,7 @@ unsafe impl Send for SendEngine {}
 static ENGINE: OnceCell<Mutex<SendEngine>> = OnceCell::new();
 
 const FILTER_URLS: &[(&str, &str)] = &[
-    (
-        "easylist",
-        "https://easylist.to/easylist/easylist.txt",
-    ),
+    ("easylist", "https://easylist.to/easylist/easylist.txt"),
     (
         "easyprivacy",
         "https://easylist.to/easylist/easyprivacy.txt",
@@ -55,7 +52,10 @@ pub async fn init() -> Result<()> {
     let mut filter_set = FilterSet::new(true);
 
     filter_set.add_filters(
-        &YOUTUBE_RULES.iter().map(|s| s.to_string()).collect::<Vec<_>>(),
+        &YOUTUBE_RULES
+            .iter()
+            .map(|s| s.to_string())
+            .collect::<Vec<_>>(),
         ParseOptions::default(),
     );
 
