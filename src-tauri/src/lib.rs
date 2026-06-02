@@ -173,7 +173,7 @@ pub fn run() {
             }
 
             // ── YouTube window ────────────────────────────────────────────
-            let yt_win = WebviewWindowBuilder::new(
+            let _yt_win = WebviewWindowBuilder::new(
                 app,
                 "youtube",
                 WebviewUrl::External("https://www.youtube.com".parse().unwrap()),
@@ -188,7 +188,7 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             {
                 let handle = app.handle().clone();
-                yt_win.on_window_event(move |event| {
+                _yt_win.on_window_event(move |event| {
                     if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                         api.prevent_close();
                         if let Some(w) = handle.get_webview_window("youtube") {
