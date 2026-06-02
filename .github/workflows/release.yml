@@ -49,7 +49,7 @@ jobs:
         run: npm run tauri build -- --bundles app --target ${{ matrix.rust_target }}
 
       - name: Create DMG → built/
-        run: node scripts/make-dmg.mjs
+        run: node scripts/make-dmg.mjs --target ${{ matrix.rust_target }}
 
       - name: Upload to release
         uses: softprops/action-gh-release@v2
