@@ -173,6 +173,13 @@ pub fn run() {
             }
 
             // ── YouTube window ────────────────────────────────────────────
+            // Spoof a real Chrome user-agent so YouTube enables all features:
+            // live chat, fullscreen, Keychain autofill, and modern UI. Without
+            // this YouTube detects the WKWebView token and disables them.
+            let user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \
+                AppleWebKit/537.36 (KHTML, like Gecko) \
+                Chrome/136.0.0.0 Safari/537.36";
+
             let _yt_win = WebviewWindowBuilder::new(
                 app,
                 "youtube",
@@ -182,6 +189,7 @@ pub fn run() {
             .inner_size(1280.0, 800.0)
             .min_inner_size(900.0, 600.0)
             .initialization_script(&init_script)
+            .user_agent(user_agent)
             .build()?;
 
             // On macOS hide to tray instead of quitting when the window is closed.
